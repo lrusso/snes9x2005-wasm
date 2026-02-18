@@ -378,7 +378,7 @@ void S9xStartScreenRefresh(void)
 
       if (PPU.BGMode == 5 || PPU.BGMode == 6)
          IPPU.Interlace = (Memory.FillRAM[0x2133] & 1);
-      if (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.Interlace)
+      if (Settings.SupportHiRes && (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.Interlace))
       {
          IPPU.RenderedScreenWidth = 512;
          IPPU.DoubleWidthPixels = true;
@@ -841,7 +841,7 @@ static void DrawOBJS(bool OnMain, uint8_t D)
       }
    }
 
-   if (PPU.BGMode == 5 || PPU.BGMode == 6)
+   if (IPPU.DoubleWidthPixels && (PPU.BGMode == 5 || PPU.BGMode == 6))
    {
       /* Bah, OnMain is never used except to determine if calling
        * SelectTileRenderer is necessary. So let's hack it to false here
@@ -1009,7 +1009,7 @@ static void DrawBackgroundMosaic(uint32_t BGMode, uint32_t bg, uint8_t Z1, uint8
       OffsetShift = 3;
    }
 
-   m5 = (BGMode == 5 || BGMode == 6) ? 1 : 0;
+   m5 = (IPPU.DoubleWidthPixels && (BGMode == 5 || BGMode == 6)) ? 1 : 0;
 
    for (Y = GFX.StartY; Y <= GFX.EndY; Y += Lines)
    {
@@ -1737,8 +1737,12 @@ static void DrawBackground(uint32_t BGMode, uint32_t bg, uint8_t Z1, uint8_t Z2)
 
       case 5:
       case 6: /* XXX: is also offset per tile. */
-         DrawBackgroundMode5(bg, Z1, Z2);
-         return;
+         if (IPPU.DoubleWidthPixels)
+         {
+            DrawBackgroundMode5(bg, Z1, Z2);
+            return;
+         }
+         break;
    }
 
    depths [0] = Z1;
@@ -2754,7 +2758,7 @@ void S9xUpdateScreen(void)
    starty = GFX.StartY;
    endy   = GFX.EndY;
 
-   if (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.Interlace || IPPU.DoubleHeightPixels)
+   if (Settings.SupportHiRes && (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.Interlace || IPPU.DoubleHeightPixels))
    {
       if (PPU.BGMode == 5 || PPU.BGMode == 6 || IPPU.Interlace)
       {

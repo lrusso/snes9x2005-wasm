@@ -1525,6 +1525,7 @@ void InitROM(bool Interleaved)
    Settings.BS = false;
    Settings.OBC1 = false;
    Settings.SETA = false;
+   Settings.SupportHiRes = true;
    s7r.DataRomSize = 0;
    Memory.CalculatedChecksum = 0;
 
@@ -3091,6 +3092,10 @@ void ApplyROMFixes(void)
          strncmp(Memory.ROMName, "LETs PACHINKO(", 14) == 0)  /* A set of BS games */
       IAPU.OneCycle = 15;
 #endif
+
+   /* Disable hi-res for games that don't need it */
+   if (match_na("DONKEY KONG COUNTRY") || match_id("AD8"))
+      Settings.SupportHiRes = false;
 
    /* Specific game fixes */
    Settings.StarfoxHack = match_na("STAR FOX") || match_na("STAR WING");
