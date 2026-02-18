@@ -17,6 +17,7 @@
 #include <sys/time.h>
 
 int joyPadInput = 0;
+int joyPadInput2 = 0;
 bool runGameFlag = false;
 unsigned char *rgba8ScreenBuffer = NULL;
 float *f32soundBuffer = NULL;
@@ -32,10 +33,16 @@ unsigned int soundBufferStuckCount = 0;
 EMSCRIPTEN_KEEPALIVE
 void setJoypadInput(int32_t input){
     joyPadInput = input;
-} 
+}
+
+EMSCRIPTEN_KEEPALIVE
+void setJoypadInput2(int32_t input){
+    joyPadInput2 = input;
+}
 
 uint32_t S9xReadJoypad(int32_t port){
-    if(port == 0)return joyPadInput;//1Pのみ対応
+    if(port == 0)return joyPadInput;
+    if(port == 1)return joyPadInput2;
     return 0;
 }
 
